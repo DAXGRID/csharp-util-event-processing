@@ -85,8 +85,10 @@ namespace DAX.EventProcessing.Serialization
 
             var eventTypes =
                 assemblies
-                .SelectMany(x => x.GetTypes().Where(y => y.GetInterfaces().Contains(typeof(BaseEventType))))
+                .SelectMany(x => x.GetTypes().Where(y => y.GetInterfaces().Contains(typeof(BaseEventType)) || (y.IsClass && !y.IsAbstract && y.IsSubclassOf(typeof(BaseEventType)))))
                 .ToList();
+
+
 
             foreach (var type in eventTypes)
             {

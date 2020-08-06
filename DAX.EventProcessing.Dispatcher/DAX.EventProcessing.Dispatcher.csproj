@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="8.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Topos.Kafka" Version="0.0.72" />
+    <PackageReference Include="Topos.Serilog" Version="0.0.72" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DAX.EventProcessing.Serialization\DAX.EventProcessing.Serialization.csproj" />
+  </ItemGroup>
+
+</Project>
