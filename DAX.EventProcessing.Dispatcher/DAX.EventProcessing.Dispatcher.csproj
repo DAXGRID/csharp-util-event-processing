@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>DAX</Authors>
+    <Product>DAX</Product>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
