@@ -23,6 +23,7 @@ jobs:
           command: dotnet test
 
   publish-nuget:
+    context: nuget
     executor: dotnet-core-sdk
     steps:
       - checkout
@@ -46,6 +47,7 @@ workflows:
             tags:
               only: /.*/
       - publish-nuget:
+          context: nuget
           requires:
             - test-app
           filters:
