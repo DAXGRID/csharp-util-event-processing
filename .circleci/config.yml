@@ -46,6 +46,7 @@ workflows:
             tags:
               only: /.*/
       - publish-nuget:
+          context: nuget
           requires:
             - test-app
           filters:
