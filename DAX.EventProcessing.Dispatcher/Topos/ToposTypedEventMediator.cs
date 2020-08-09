@@ -6,16 +6,15 @@ using System.Collections.Generic;
 using System.Text;
 using Topos.Config;
 
-namespace DAX.EventProcessing.Dispatcher.Kafka
+namespace DAX.EventProcessing.Dispatcher.Topos
 {
-    public class KafkaEventDispatcher<BaseEventType> : IGenericEventDispatcher<BaseEventType>
+    public class ToposTypedEventMediator<BaseEventType> : IToposTypedEventMediator<BaseEventType>
     {
-        private IDisposable _consumer;
-        private readonly ILogger<KafkaEventDispatcher<BaseEventType>> _logger;
+        private readonly ILogger<ToposTypedEventMediator<BaseEventType>> _logger;
         private readonly IMediator _mediator;
 
-        public KafkaEventDispatcher(
-            ILogger<KafkaEventDispatcher<BaseEventType>> logger,
+        public ToposTypedEventMediator(
+            ILogger<ToposTypedEventMediator<BaseEventType>> logger,
             IMediator mediator
             )
         {
@@ -23,13 +22,16 @@ namespace DAX.EventProcessing.Dispatcher.Kafka
             _mediator = mediator;
         }
 
-        public void ConfigAndStart(string[] kafkaServers, string kafkaGroupName, string[] topics, string positionFilePath)
+        /// <summary>
+        /// Sets up serialization and handler. You need to setup topics, logging etc. according to Topos documentation.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="configure"></param>
+        /// <returns></returns>
+        public ToposConsumerConfigurer Config(string groupName, Action<StandardConfigurer<global::Topos.IConsumerImplementation>> configure)
         {
-            var config = Configure
-                          .Consumer(kafkaGroupName, c => c.UseKafka(kafkaServers))
-                          .Logging(l => l.UseSerilog())
+            var config = Configure.Consumer(groupName, configure)
                           .Serialization(s => s.GenericEventDeserializer<BaseEventType>())
-                          .Positions(p => p.StoreInFileSystem(positionFilePath))
                           .Handle(async (messages, context, token) =>
                           {
                               foreach (var message in messages)
@@ -38,7 +40,7 @@ namespace DAX.EventProcessing.Dispatcher.Kafka
                                   {
                                       // We received an event that a class is defined for, so it should be handled by someone
                                       case BaseEventType domainEvent:
-                                          _logger.LogDebug($"The received Kafka event: {domainEvent.GetType().Name} is send to handler...");
+                                          _logger.LogDebug($"The dispatcher got an event: {domainEvent.GetType().Name} which is now send to handler.");
 
                                           Type eventType = message.Body.GetType();
                                           await _mediator.Send(domainEvent);
@@ -52,14 +54,7 @@ namespace DAX.EventProcessing.Dispatcher.Kafka
                               }
                           });
 
-            foreach (var topic in topics)
-                config.Topics(t => t.Subscribe(topic));
-
-            _consumer = config.Start();
-        }
-
-        public void Dispose()
-        {
+            return config;
         }
     }
 }
