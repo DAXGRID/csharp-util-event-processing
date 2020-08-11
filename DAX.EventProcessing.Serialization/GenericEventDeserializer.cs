@@ -36,7 +36,7 @@ namespace DAX.EventProcessing.Serialization
             var eventTypeName = GetEventTypeNameFromMessage(message);
 
             if (eventTypeName == null)
-                return new ReceivedLogicalMessage(message.Headers, new EventCouldNotBeDeserialized("notset", $"Could not find {_rebusMsgTypeHeaderKey} header"), message.Position);
+                return new ReceivedLogicalMessage(message.Headers, new EventCouldNotBeDeserialized("notset", $"Could not find {_rebusMsgTypeHeaderKey} header", messageBody), message.Position);
 
             if (GetEventTypes().ContainsKey(eventTypeName.ToLower()))
             {
@@ -47,7 +47,7 @@ namespace DAX.EventProcessing.Serialization
                 return new ReceivedLogicalMessage(message.Headers, eventObject, message.Position);
             }
 
-            var errorEvent = new EventCouldNotBeDeserialized(eventTypeName, $"Deserializer did not found a class with the name: '{eventTypeName}' So, the event will not be deserialized!");
+            var errorEvent = new EventCouldNotBeDeserialized(eventTypeName, $"Deserializer did not found a class with the name: '{eventTypeName}' So, the event will not be deserialized!", messageBody);
 
             return new ReceivedLogicalMessage(message.Headers, errorEvent, message.Position);
         }
@@ -85,7 +85,8 @@ namespace DAX.EventProcessing.Serialization
 
             var eventTypes =
                 assemblies
-                .SelectMany(x => x.GetTypes().Where(y => y.GetInterfaces().Contains(typeof(BaseEventType)) || (y.IsClass && !y.IsAbstract && y.IsSubclassOf(typeof(BaseEventType)))))
+                //.SelectMany(x => x.GetTypes().Where(y => y.GetInterfaces().Contains(typeof(BaseEventType)) || (y.IsClass && !y.IsAbstract && y.IsSubclassOf(typeof(BaseEventType)))))
+                .SelectMany(x => x.GetTypes().Where(y => y.IsSubclassOf(typeof(BaseEventType))))
                 .ToList();
 
 

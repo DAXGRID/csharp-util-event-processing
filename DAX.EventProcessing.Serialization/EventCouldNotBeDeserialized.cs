@@ -8,11 +8,13 @@ namespace DAX.EventProcessing.Serialization
     {
         public string EventClassName { get; }
         public string ErrorMessage { get; }
+        public string MessageBody { get;  }
 
-        public EventCouldNotBeDeserialized(string eventClassName, string errorMessage)
+        public EventCouldNotBeDeserialized(string eventClassName, string errorMessage, string messageBody)
         {
             EventClassName = eventClassName;
             ErrorMessage = errorMessage;
+            MessageBody = messageBody;
         }
     }
 }
