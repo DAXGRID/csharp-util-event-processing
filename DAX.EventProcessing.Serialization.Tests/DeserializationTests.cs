@@ -17,16 +17,16 @@ namespace DAX.EventProcessing.Serialization.Tests
 
             headers.Add("tps-msg-type", "OpenFTTH.GDBIntegrator.Integrator.EventMessages.RouteNodeAdded, OpenFTTH.GDBIntegrator.Integrator");
 
-            var bodyJson = "{\"EventType\":\"RouteNodeAddedCommand\",\"EventTs\":\"2020-07-28T08:04:37.8098439Z\",\"CmdId\":\"e3693ffe-be4b-490b-9b1d-5c2883ea3849\",\"EventId\":\"351428bc-1606-44ff-b6e4-396664ccef9b\",\"NodeId\":\"b41a377c-ebe6-4327-9f08-ff58f70c2bb1\",\"Geometry\":\"[538888.8171487605,6210640.758167612]\"}";
+            var bodyJson = "{\"EventType\":\"RouteNodeAdded\",\"EventTs\":\"2020-07-28T08:04:37.8098439Z\",\"CmdId\":\"e3693ffe-be4b-490b-9b1d-5c2883ea3849\",\"EventId\":\"351428bc-1606-44ff-b6e4-396664ccef9b\",\"NodeId\":\"b41a377c-ebe6-4327-9f08-ff58f70c2bb1\",\"Geometry\":\"[538888.8171487605,6210640.758167612]\"}";
 
             var bodyBytes = Encoding.UTF8.GetBytes(bodyJson);
 
             var messageToDeserialized = new ReceivedTransportMessage(position, headers, bodyBytes);
 
-            var logicalMessage = new GenericEventDeserializer<IDomainEvent>().Deserialize(messageToDeserialized);
+            var logicalMessage = new GenericEventDeserializer<DomainEvent>().Deserialize(messageToDeserialized);
 
             Assert.True(logicalMessage.Body is RouteNodeAdded);
-            Assert.Equal("RouteNodeAddedCommand", ((RouteNodeAdded)logicalMessage.Body).EventType);
+            Assert.Equal("RouteNodeAdded", ((RouteNodeAdded)logicalMessage.Body).EventType);
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace DAX.EventProcessing.Serialization.Tests
 
             var messageToDeserialized = new ReceivedTransportMessage(position, headers, bodyBytes);
 
-            var logicalMessage = new GenericEventDeserializer<IDomainEvent>().Deserialize(messageToDeserialized);
+            var logicalMessage = new GenericEventDeserializer<DomainEvent>().Deserialize(messageToDeserialized);
 
             Assert.True(logicalMessage.Body is EventCouldNotBeDeserialized);
             Assert.Equal("SomeWeirdEvent", ((EventCouldNotBeDeserialized)logicalMessage.Body).EventClassName);
@@ -62,7 +62,7 @@ namespace DAX.EventProcessing.Serialization.Tests
 
             var messageToDeserialized = new ReceivedTransportMessage(position, headers, bodyBytes);
 
-            var logicalMessage = new GenericEventDeserializer<IDomainEvent>().Deserialize(messageToDeserialized);
+            var logicalMessage = new GenericEventDeserializer<DomainEvent>().Deserialize(messageToDeserialized);
 
             Assert.True(logicalMessage.Body is EventCouldNotBeDeserialized);
         }
