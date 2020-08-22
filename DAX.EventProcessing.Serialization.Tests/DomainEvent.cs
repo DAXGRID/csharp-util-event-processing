@@ -9,6 +9,7 @@ namespace DAX.EventProcessing.Serialization.Tests
     /// </summary>
     public class DomainEvent : IDomainEvent
     {
+        public long EventSequenceNumber { get; set; }
         public string EventType { get; set; }
         public Guid EventId { get; set; }
         public string CmdType { get; set; }

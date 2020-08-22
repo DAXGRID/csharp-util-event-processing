@@ -12,7 +12,8 @@ namespace DAX.EventProcessing.Serialization.Tests
         [Fact]
         public void Deserialize_StandardToposSerializedEvent_ShouldWork()
         {
-            var position = new Position();
+            var position = new Position("hey", 1, 666);
+
             var headers = new Dictionary<string, string>();
 
             headers.Add("tps-msg-type", "OpenFTTH.GDBIntegrator.Integrator.EventMessages.RouteNodeAdded, OpenFTTH.GDBIntegrator.Integrator");
@@ -25,8 +26,16 @@ namespace DAX.EventProcessing.Serialization.Tests
 
             var logicalMessage = new GenericEventDeserializer<DomainEvent>().Deserialize(messageToDeserialized);
 
+            // Check if got a route node added object from deserializer
             Assert.True(logicalMessage.Body is RouteNodeAdded);
-            Assert.Equal("RouteNodeAdded", ((RouteNodeAdded)logicalMessage.Body).EventType);
+
+            var routeNodeAddedEvent = logicalMessage.Body as RouteNodeAdded;
+
+            Assert.Equal("RouteNodeAdded", (routeNodeAddedEvent).EventType);
+
+            // Check if event sequence number was set to 666
+            Assert.Equal(666, routeNodeAddedEvent.EventSequenceNumber);
+
         }
 
         [Fact]

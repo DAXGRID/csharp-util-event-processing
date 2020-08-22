@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using Topos.Config;
 using Topos.Serialization;
+using System.Reflection;
 
 namespace DAX.EventProcessing.Serialization
 {
@@ -43,6 +44,13 @@ namespace DAX.EventProcessing.Serialization
                 var eventType = GetEventTypes()[eventTypeName.ToLower()];
 
                 var eventObject = JsonConvert.DeserializeObject(messageBody, eventType);
+                
+                // Set event sequence number, if such attribut exitsts
+                PropertyInfo prop = eventObject.GetType().GetProperty("EventSequenceNumber", BindingFlags.Public | BindingFlags.Instance);
+                if (null != prop && prop.CanWrite)
+                {
+                    prop.SetValue(eventObject, message.Position.Offset, null);
+                }
 
                 return new ReceivedLogicalMessage(message.Headers, eventObject, message.Position);
             }
