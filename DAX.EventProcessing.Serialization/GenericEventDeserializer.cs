@@ -8,6 +8,7 @@ using System.Text;
 using Topos.Config;
 using Topos.Serialization;
 using System.Reflection;
+using Serilog;
 
 namespace DAX.EventProcessing.Serialization
 {
@@ -33,6 +34,8 @@ namespace DAX.EventProcessing.Serialization
                 throw new ArgumentNullException($"{nameof(ReceivedTransportMessage)} body is null");
 
             var messageBody = Encoding.UTF8.GetString(message.Body, 0, message.Body.Length);
+
+            Log.Verbose(messageBody);
 
             var eventTypeName = GetEventTypeNameFromMessage(message);
 
@@ -93,10 +96,8 @@ namespace DAX.EventProcessing.Serialization
 
             var eventTypes =
                 assemblies
-                //.SelectMany(x => x.GetTypes().Where(y => y.GetInterfaces().Contains(typeof(BaseEventType)) || (y.IsClass && !y.IsAbstract && y.IsSubclassOf(typeof(BaseEventType)))))
-                .SelectMany(x => x.GetTypes().Where(y => y.IsSubclassOf(typeof(BaseEventType))))
+                .SelectMany(x => x.GetTypes().Where(y => y.IsSubclassOf(typeof(BaseEventType)) || y is BaseEventType || y.Equals(typeof(BaseEventType))))
                 .ToList();
-
 
 
             foreach (var type in eventTypes)
