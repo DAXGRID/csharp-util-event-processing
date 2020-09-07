@@ -41,7 +41,16 @@ namespace DAX.EventProcessing.Dispatcher.Topos
                                       case BaseEventType domainEvent:
                                           _logger.LogDebug($"The dispatcher got an event: {domainEvent.GetType().Name} which is send to observers.");
 
-                                          _eventOccured.OnNext(domainEvent);
+                                          try
+                                          {
+                                              _eventOccured.OnNext(domainEvent);
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              _logger.LogError("Got an execpetion calling observer: " + ex);
+                                              _logger.LogError(ex, ex.Message);
+                                              throw ex;
+                                          }
                                           break;
 
                                       // We received an event that could not be deserialized

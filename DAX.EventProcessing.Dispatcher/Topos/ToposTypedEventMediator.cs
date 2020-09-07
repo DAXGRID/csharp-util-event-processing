@@ -43,7 +43,17 @@ namespace DAX.EventProcessing.Dispatcher.Topos
                                           _logger.LogDebug($"The dispatcher got an event: {domainEvent.GetType().Name} which is now send to handler.");
 
                                           Type eventType = message.Body.GetType();
-                                          await _mediator.Send(domainEvent);
+
+                                          try
+                                          {
+                                              await _mediator.Send(domainEvent);
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              _logger.LogError("Got an execpetion calling Mediatr.Send: " + ex);
+                                              _logger.LogError(ex, ex.Message);
+                                              throw ex;
+                                          }
                                           break;
 
                                       // We received an event that could not be deserialized
