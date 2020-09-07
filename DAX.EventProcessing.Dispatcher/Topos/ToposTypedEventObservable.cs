@@ -49,7 +49,7 @@ namespace DAX.EventProcessing.Dispatcher.Topos
                                           {
                                               _logger.LogError("Got an execpetion calling observer: " + ex);
                                               _logger.LogError(ex, ex.Message);
-                                              throw ex;
+                                              throw;
                                           }
                                           break;
 

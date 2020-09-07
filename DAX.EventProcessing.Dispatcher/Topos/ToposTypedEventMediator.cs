@@ -52,7 +52,7 @@ namespace DAX.EventProcessing.Dispatcher.Topos
                                           {
                                               _logger.LogError("Got an execpetion calling Mediatr.Send: " + ex);
                                               _logger.LogError(ex, ex.Message);
-                                              throw ex;
+                                              throw;
                                           }
                                           break;
 
