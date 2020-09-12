@@ -37,7 +37,7 @@ namespace DAX.EventProcessing.Serialization
 
                 var messageBody = Encoding.UTF8.GetString(message.Body, 0, message.Body.Length);
 
-                Log.Verbose(messageBody);
+                Log.Debug(messageBody);
 
                 var eventTypeName = GetEventTypeNameFromMessage(message);
 
