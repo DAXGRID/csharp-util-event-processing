@@ -25,42 +25,51 @@ namespace DAX.EventProcessing.Serialization
 
         public ReceivedLogicalMessage Deserialize(ReceivedTransportMessage message)
         {
-            var typeList = GetEventTypes();
-
-            if (message is null)
-                throw new ArgumentNullException($"{nameof(ReceivedTransportMessage)} is null");
-
-            if (message.Body is null || message.Body.Length == 0)
-                throw new ArgumentNullException($"{nameof(ReceivedTransportMessage)} body is null");
-
-            var messageBody = Encoding.UTF8.GetString(message.Body, 0, message.Body.Length);
-
-            Log.Verbose(messageBody);
-
-            var eventTypeName = GetEventTypeNameFromMessage(message);
-
-            if (eventTypeName == null)
-                return new ReceivedLogicalMessage(message.Headers, new EventCouldNotBeDeserialized("notset", $"Could not find {_rebusMsgTypeHeaderKey} header", messageBody), message.Position);
-
-            if (GetEventTypes().ContainsKey(eventTypeName.ToLower()))
+            try
             {
-                var eventType = GetEventTypes()[eventTypeName.ToLower()];
+                var typeList = GetEventTypes();
 
-                var eventObject = JsonConvert.DeserializeObject(messageBody, eventType);
-                
-                // Set event sequence number, if such attribut exitsts
-                PropertyInfo prop = eventObject.GetType().GetProperty("EventSequenceNumber", BindingFlags.Public | BindingFlags.Instance);
-                if (null != prop && prop.CanWrite)
+                if (message is null)
+                    throw new ArgumentNullException($"{nameof(ReceivedTransportMessage)} is null");
+
+                if (message.Body is null || message.Body.Length == 0)
+                    throw new ArgumentNullException($"{nameof(ReceivedTransportMessage)} body is null");
+
+                var messageBody = Encoding.UTF8.GetString(message.Body, 0, message.Body.Length);
+
+                Log.Verbose(messageBody);
+
+                var eventTypeName = GetEventTypeNameFromMessage(message);
+
+                if (eventTypeName == null)
+                    return new ReceivedLogicalMessage(message.Headers, new EventCouldNotBeDeserialized("notset", $"Could not find {_rebusMsgTypeHeaderKey} header", messageBody), message.Position);
+
+                if (GetEventTypes().ContainsKey(eventTypeName.ToLower()))
                 {
-                    prop.SetValue(eventObject, message.Position.Offset, null);
+                    var eventType = GetEventTypes()[eventTypeName.ToLower()];
+
+                    var eventObject = JsonConvert.DeserializeObject(messageBody, eventType);
+
+                    // Set event sequence number, if such attribut exitsts
+                    PropertyInfo prop = eventObject.GetType().GetProperty("EventSequenceNumber", BindingFlags.Public | BindingFlags.Instance);
+                    if (null != prop && prop.CanWrite)
+                    {
+                        prop.SetValue(eventObject, message.Position.Offset, null);
+                    }
+
+                    return new ReceivedLogicalMessage(message.Headers, eventObject, message.Position);
                 }
 
-                return new ReceivedLogicalMessage(message.Headers, eventObject, message.Position);
+                var errorEvent = new EventCouldNotBeDeserialized(eventTypeName, $"Deserializer did not found a class with the name: '{eventTypeName}' So, the event will not be deserialized!", messageBody);
+
+                return new ReceivedLogicalMessage(message.Headers, errorEvent, message.Position);
             }
-
-            var errorEvent = new EventCouldNotBeDeserialized(eventTypeName, $"Deserializer did not found a class with the name: '{eventTypeName}' So, the event will not be deserialized!", messageBody);
-
-            return new ReceivedLogicalMessage(message.Headers, errorEvent, message.Position);
+            catch (Exception ex)
+            {
+                // Make sure any exception occuring in deserialization gets logged
+                Log.Error(ex, ex.Message);
+                throw;
+            }
         }
 
         public TransportMessage Serialize(LogicalMessage message)
