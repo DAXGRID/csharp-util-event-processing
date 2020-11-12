@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.9.0" />
-    <PackageReference Include="Topos" Version="0.0.72" />
+    <PackageReference Include="Topos" Version="0.0.88" />
   </ItemGroup>
 
 </Project>

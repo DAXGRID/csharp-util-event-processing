@@ -1,4 +1,3 @@
-using OpenFTTH.Events.Geo;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -40,38 +39,10 @@ namespace DAX.EventProcessing.Serialization.Tests
         }
 
         [Fact]
-        public void Deserialize_SpecificTypeFromAnotherAssembly_ShouldWork()
-        {
-            var position = new Position("hey", 1, 666);
-
-            var headers = new Dictionary<string, string>();
-
-            headers.Add("tps-msg-type", "OpenFTTH.Events.Geo.ObjectsWithinGeographicalAreaUpdated, OpenFTTH.Events.Geo");
-
-            var bodyJson = "{\"EventType\":\"ObjectsWithinGeographicalAreaUpdated\",\"EventTs\":\"2020-07-28T08:04:37.8098439Z\",\"CmdId\":\"e3693ffe-be4b-490b-9b1d-5c2883ea3849\",\"EventId\":\"351428bc-1606-44ff-b6e4-396664ccef9b\",\"NodeId\":\"b41a377c-ebe6-4327-9f08-ff58f70c2bb1\",\"Geometry\":\"[538888.8171487605,6210640.758167612]\"}";
-
-            var bodyBytes = Encoding.UTF8.GetBytes(bodyJson);
-
-            var messageToDeserialized = new ReceivedTransportMessage(position, headers, bodyBytes);
-
-            var logicalMessage = new GenericEventDeserializer<ObjectsWithinGeographicalAreaUpdated>().Deserialize(messageToDeserialized);
-
-            // Check if got a route node added object from deserializer
-            Assert.True(logicalMessage.Body is ObjectsWithinGeographicalAreaUpdated);
-
-            var myEvent = logicalMessage.Body as ObjectsWithinGeographicalAreaUpdated;
-
-            Assert.Equal("ObjectsWithinGeographicalAreaUpdated", (myEvent).EventType);
-
-            // Check if event sequence number was set to 666
-            Assert.Equal(666, myEvent.EventSequenceNumber);
-        }
-
-        [Fact]
         public void Deserialize_UndefinedClass_ShouldReturnEventCouldNotBeDeserializedEvent()
         {
             // Create an event of type SomeWeirdEvent, that we have no class defined for
-            var position = new Position();
+            var position = new Position("hest",1,1);
             var headers = new Dictionary<string, string>();
 
             headers.Add("tps-msg-type", "OpenFTTH.GDBIntegrator.Integrator.EventMessages.SomeWeirdEvent, OpenFTTH.GDBIntegrator.Integrator");
@@ -92,7 +63,7 @@ namespace DAX.EventProcessing.Serialization.Tests
         public void Deserialize_NoToposHeader_ShouldReturnEventCouldNotBeDeserialized()
         {
             // Create an event with no topos header information
-            var position = new Position();
+            var position = new Position("hest", 1, 1);
             var headers = new Dictionary<string, string>();
             var bodyJson = "{\"EventType\":\"RouteNodeAddedCommand\",\"EventTs\":\"2020-07-28T08:04:37.8098439Z\",\"CmdId\":\"e3693ffe-be4b-490b-9b1d-5c2883ea3849\",\"EventId\":\"351428bc-1606-44ff-b6e4-396664ccef9b\",\"NodeId\":\"b41a377c-ebe6-4327-9f08-ff58f70c2bb1\",\"Geometry\":\"[538888.8171487605,6210640.758167612]\"}";
 
@@ -104,7 +75,5 @@ namespace DAX.EventProcessing.Serialization.Tests
 
             Assert.True(logicalMessage.Body is EventCouldNotBeDeserialized);
         }
-
-      
     }
 }
