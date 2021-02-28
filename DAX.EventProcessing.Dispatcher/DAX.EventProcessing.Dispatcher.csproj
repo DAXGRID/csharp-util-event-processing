@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aocl" Version="1.4.0" />
     <PackageReference Include="MediatR" Version="8.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.6" />
     <PackageReference Include="System.Reactive" Version="4.4.1" />
