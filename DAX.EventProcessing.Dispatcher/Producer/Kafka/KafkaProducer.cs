@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Confluent.Kafka;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Topos.Config;
@@ -9,12 +10,14 @@ namespace DAX.EventProcessing
     public class KafkaProducer : IExternalEventProducer
     {
         private readonly string _kafkaServerName;
+        private readonly string _certificateFilename;
         private IToposProducer _producer;
         private readonly ILogger<KafkaProducer> _logger;
 
-        public KafkaProducer(string kafkaServerName, ILogger<KafkaProducer> logger)
+        public KafkaProducer(ILogger<KafkaProducer> logger, string kafkaServerName, string certificateFilename)
         {
             _kafkaServerName = kafkaServerName;
+            _certificateFilename = certificateFilename;
             _logger = logger;
         }
 
@@ -22,9 +25,17 @@ namespace DAX.EventProcessing
         {
             if (_producer is null)
             {
-                _producer = Configure.Producer(c => c.UseKafka(_kafkaServerName))
-                    .Serialization(s => s.UseNewtonsoftJson())
-                    .Create();
+                _producer = Configure.Producer(c => {
+                    var kafkaConfig = c.UseKafka(_kafkaServerName);
+
+                    if (_certificateFilename != null)
+                    {
+                        kafkaConfig.WithCertificate(_certificateFilename);
+                    }
+                 })
+                 .Logging(l => l.UseSerilog())
+                 .Serialization(s => s.UseNewtonsoftJson())
+                 .Create();
             }
         }
 
@@ -46,6 +57,20 @@ namespace DAX.EventProcessing
         public void Dispose()
         {
             _producer.Dispose();
+        }
+    }
+
+    public static class KafkaSslExtension
+    {
+        public static KafkaProducerConfigurationBuilder WithCertificate(this KafkaProducerConfigurationBuilder builder, string sslCaLocation)
+        {
+            KafkaProducerConfigurationBuilder.AddCustomizer(builder, config =>
+            {
+                config.SecurityProtocol = SecurityProtocol.Ssl;
+                config.SslCaLocation = sslCaLocation;
+                return config;
+            });
+            return builder;
         }
     }
 }
