@@ -1,22 +1,17 @@
 ﻿using DAX.EventProcessing.Serialization;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Reactive.Subjects;
-using System.Text;
 using Topos.Config;
 
 namespace DAX.EventProcessing.Dispatcher.Topos
 {
     public class ToposTypedEventObservable<BaseEventType> : IToposTypedEventObservable<BaseEventType>
     {
-        private readonly ILogger<ToposTypedEventMediator<BaseEventType>> _logger;
+        private readonly ILogger<IToposTypedEventObservable<BaseEventType>> _logger;
         private Subject<BaseEventType> _eventOccured = new Subject<BaseEventType>();
 
-        public ToposTypedEventObservable(
-            ILogger<ToposTypedEventMediator<BaseEventType>> logger
-            )
+        public ToposTypedEventObservable(ILogger<ToposTypedEventObservable<BaseEventType>> logger)
         {
             _logger = logger;
         }
