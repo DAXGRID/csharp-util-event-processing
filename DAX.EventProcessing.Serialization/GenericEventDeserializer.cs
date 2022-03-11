@@ -1,14 +1,11 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Topos.Config;
 using Topos.Serialization;
-using System.Reflection;
-using Serilog;
 
 namespace DAX.EventProcessing.Serialization
 {
@@ -90,7 +87,7 @@ namespace DAX.EventProcessing.Serialization
                 }
             }
 
-           return null;
+            return null;
         }
 
 
@@ -98,7 +95,7 @@ namespace DAX.EventProcessing.Serialization
         {
             if (_types != null)
                 return _types;
-                      
+
             _types = new Dictionary<string, Type>();
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.GetName().Name.ToLower().StartsWith("microsoft") && !a.GetName().Name.ToLower().StartsWith("system"));
