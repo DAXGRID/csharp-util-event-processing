@@ -6,7 +6,7 @@ public class TypedEventObservable<BaseEventType> : ITypedEventObservable<BaseEve
 {
     private readonly Subject<BaseEventType> _eventOccured = new();
 
-    public void NewEvent(BaseEventType baseEvent)
+    public void Dispatch(BaseEventType baseEvent)
     {
         _eventOccured.OnNext(baseEvent);
     }
