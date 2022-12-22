@@ -10,7 +10,7 @@ namespace DAX.EventProcessing.Dispatcher.Topos
     public class ToposTypedEventObservable<BaseEventType> : IToposTypedEventObservable<BaseEventType>
     {
         private readonly ILogger<IToposTypedEventObservable<BaseEventType>> _logger;
-        private Subject<BaseEventType> _eventOccured = new Subject<BaseEventType>();
+        private readonly Subject<BaseEventType> _eventOccured = new();
 
         public ToposTypedEventObservable(ILogger<ToposTypedEventObservable<BaseEventType>> logger)
         {
