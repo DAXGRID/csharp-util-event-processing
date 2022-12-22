@@ -4,6 +4,6 @@ namespace DAX.EventProcessing.Dispatcher;
 
 public interface ITypedEventObservable<BaseEventType>
 {
-    void NewEvent(BaseEventType baseEvent);
+    void Dispatch(BaseEventType baseEvent);
     Subject<BaseEventType> OnEvent { get; }
 }
