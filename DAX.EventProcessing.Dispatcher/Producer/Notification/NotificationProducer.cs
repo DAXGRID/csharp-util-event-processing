@@ -1,7 +1,5 @@
 using OpenFTTH.NotificationClient;
-using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -11,11 +9,8 @@ public class NotificationProducer : IExternalEventProducer
 {
     private readonly OpenFTTH.NotificationClient.Client _notificationClient;
 
-    public NotificationProducer(string domain, int port)
+    public NotificationProducer(IPAddress ipAddress, int port)
     {
-        var ipAddress = Dns.GetHostEntry(domain).AddressList
-            .First(x => x.AddressFamily == AddressFamily.InterNetwork);
-
         _notificationClient = new(ipAddress, port, true);
         _notificationClient.Connect();
     }
