@@ -21,37 +21,33 @@ namespace DAX.EventProcessing
             _logger = logger;
         }
 
-        public void Init()
+        private void Init()
         {
             if (_producer is null)
             {
-                _producer = Configure.Producer(c => {
+                _producer = Configure.Producer(c =>
+                {
                     var kafkaConfig = c.UseKafka(_kafkaServerName);
 
                     if (_certificateFilename != null)
                     {
                         kafkaConfig.WithCertificate(_certificateFilename);
                     }
-                 })
+                })
                  .Logging(l => l.UseSerilog())
                  .Serialization(s => s.UseNewtonsoftJson())
                  .Create();
             }
         }
 
-        public async Task Produce(string topicName, object toposMessage)
+        public async Task Produce(string name, object message)
         {
-            _logger.LogDebug($"Sending message topicname: {topicName} and body {JsonConvert.SerializeObject(toposMessage, Formatting.Indented)}");
+            _logger.LogDebug($"Sending message topicname: {name} and body {JsonConvert.SerializeObject(message, Formatting.Indented)}");
 
             if (_producer == null)
                 Init();
 
-            await _producer.Send(topicName, new ToposMessage(toposMessage));
-        }
-
-        public async Task Produce(string topicName, object toposMessage, string partitionKey)
-        {
-            await _producer.Send(topicName, new ToposMessage(toposMessage), partitionKey);
+            await _producer.Send(name, new ToposMessage(message));
         }
 
         public void Dispose()
