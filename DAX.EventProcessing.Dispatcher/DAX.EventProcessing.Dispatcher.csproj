@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Aocl" Version="1.4.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-    <PackageReference Include="OpenFTTH.NotificationClient" Version="0.2.0" />
+    <PackageReference Include="OpenFTTH.NotificationClient" Version="0.3.0" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
     <PackageReference Include="Topos.Kafka" Version="0.1.3" />
     <PackageReference Include="Topos.NewtonsoftJson" Version="0.1.3" />
